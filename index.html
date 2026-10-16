@@ -80,7 +80,6 @@
             </tr>
           </thead>
           <tbody id="mc-answers-table">
-            <!-- JavaScriptで動的生成 -->
           </tbody>
         </table>
       </div>
@@ -90,20 +89,17 @@
     <div class="bg-white p-6 rounded-xl shadow">
       <h3 class="font-bold mb-4">現在順位・累計得点</h3>
       <div id="mc-leaderboard" class="grid grid-cols-2 md:grid-cols-4 gap-2">
-        <!-- JavaScriptで動的生成 -->
       </div>
     </div>
   </div>
 
   <!-- 回答者（スマホ）画面 -->
   <div id="player-screen" class="hidden max-w-md mx-auto space-y-4">
-    <!-- ヘッダー（班名常時表示） -->
     <div class="bg-indigo-600 text-white p-4 rounded-xl shadow flex justify-between items-center">
       <span class="text-sm">参加中</span>
       <span id="player-team-badge" class="text-2xl font-black">A 班</span>
     </div>
 
-    <!-- 問題表示 -->
     <div class="bg-white p-6 rounded-xl shadow space-y-2">
       <div class="flex justify-between items-center">
         <span id="player-q-num" class="font-bold text-indigo-600">第 1 問</span>
@@ -112,7 +108,6 @@
       <p id="player-q-text" class="text-base font-medium">MCが回答を開始するまでお待ちください。</p>
     </div>
 
-    <!-- 回答入力フォーム -->
     <div class="bg-white p-6 rounded-xl shadow space-y-4">
       <input type="text" id="player-input" placeholder="回答を入力" class="w-full border-2 border-slate-300 rounded-lg p-3 text-lg focus:border-indigo-500 outline-none">
       <button id="player-submit-btn" onclick="submitAnswer()" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg text-lg hover:bg-indigo-700 disabled:opacity-50">
@@ -121,17 +116,14 @@
       <p id="player-submitted-msg" class="text-sm text-center text-emerald-600 font-bold hidden">送信完了しました（変更不可）</p>
     </div>
 
-    <!-- 公開された全班の回答一覧 -->
     <div class="bg-white p-6 rounded-xl shadow space-y-2">
       <h4 class="text-sm font-bold border-b pb-1">みんなの回答（MC公開分）</h4>
       <div id="player-public-answers" class="grid grid-cols-2 gap-2 text-sm">
-        <!-- JavaScriptで動的生成 -->
       </div>
     </div>
   </div>
 
   <script>
-    // --- 1. Firebase 初期化設定 ---
     const firebaseConfig = {
       apiKey: "AIzaSyC7Yb8ESqEuIZlW5KVYYvZDu1Iy1mW5cQY",
       authDomain: "be-unique-e5413.firebaseapp.com",
@@ -144,7 +136,6 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // --- 2. 事前登録問題（全6問） ---
     const quizQuestions = [
       {
         id: 1,
@@ -233,7 +224,6 @@
       }
     }
 
-    // --- 3. MC ロジック ---
     function initMC() {
       db.collection("game").doc("state").onSnapshot(doc => {
         if (!doc.exists) return;
@@ -364,7 +354,6 @@
       });
     }
 
-    // --- 4. 回答者 ロジック ---
     function initPlayer() {
       db.collection("game").doc("state").onSnapshot(doc => {
         if (!doc.exists) return;
