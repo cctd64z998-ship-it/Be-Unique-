@@ -47,8 +47,13 @@
         <span class="text-sm text-slate-500">現在の問題</span>
         <h2 id="mc-q-num" class="text-2xl font-bold">第 1 問</h2>
       </div>
-      <div id="mc-status-badge" class="px-3 py-1 bg-gray-200 text-gray-700 rounded-full text-sm font-bold">
-        待機中
+      <div class="flex items-center gap-3">
+        <button onclick="resetAllGameData()" class="bg-rose-100 text-rose-700 border border-rose-300 px-3 py-1 rounded-lg text-xs font-bold hover:bg-rose-200">
+          全データリセット（本番開始用）
+        </button>
+        <div id="mc-status-badge" class="px-3 py-1 bg-gray-200 text-gray-700 rounded-full text-sm font-bold">
+          待機中
+        </div>
       </div>
     </div>
 
@@ -319,102 +324,4 @@
         const isDuplicate = ans ? countMap[ans] > 1 : false;
         const isCorrect = ans ? validAnswers.includes(ans) : false;
 
-        await db.collection("answers").doc(team).set({
-          isDuplicate: isDuplicate,
-          isCorrect: isCorrect && !isDuplicate
-        }, { merge: true });
-      });
-    }
-
-    async function finalizeScore() {
-      const snapshot = await db.collection("answers").get();
-      snapshot.forEach(async doc => {
-        const data = doc.data();
-        if (data.isCorrect && !data.isDuplicate) {
-          const scoreDoc = await db.collection("scores").doc(doc.id).get();
-          const currentScore = (scoreDoc.exists ? scoreDoc.data().score : 0) || 0;
-          await db.collection("scores").doc(doc.id).set({ score: currentScore + 1 });
-        }
-      });
-      alert("ポイントの加算が完了しました。");
-    }
-
-    async function nextQuestion() {
-      const stateDoc = await db.collection("game").doc("state").get();
-      const nextIndex = (stateDoc.data().currentQIndex || 0) + 1;
-      
-      if (nextIndex >= quizQuestions.length) {
-        alert("全問題が終了しました。");
-        return;
-      }
-
-      await db.collection("game").doc("state").set({ currentQIndex: nextIndex, status: "waiting" });
-      TEAMS.forEach(async team => {
-        await db.collection("answers").doc(team).set({ text: "", isPublic: false, isDuplicate: false, isCorrect: false });
-      });
-    }
-
-    function initPlayer() {
-      db.collection("game").doc("state").onSnapshot(doc => {
-        if (!doc.exists) return;
-        const state = doc.data();
-        const qIndex = state.currentQIndex || 0;
-        const q = quizQuestions[qIndex];
-
-        document.getElementById("player-q-num").textContent = `第 ${qIndex + 1} 問`;
-        document.getElementById("player-q-text").textContent = q.text;
-
-        const isClosed = state.status !== "open";
-        document.getElementById("player-input").disabled = isClosed;
-        document.getElementById("player-submit-btn").disabled = isClosed;
-        document.getElementById("player-status-badge").textContent = 
-          state.status === "open" ? "受付中" : "受付停止中";
-      });
-
-      db.collection("answers").onSnapshot(snapshot => {
-        const answers = {};
-        snapshot.forEach(doc => { answers[doc.id] = doc.data(); });
-
-        if (answers[myTeam] && answers[myTeam].text) {
-          document.getElementById("player-input").value = answers[myTeam].text;
-          document.getElementById("player-input").disabled = true;
-          document.getElementById("player-submit-btn").disabled = true;
-          document.getElementById("player-submitted-msg").classList.remove("hidden");
-        } else {
-          document.getElementById("player-submitted-msg").classList.add("hidden");
-        }
-
-        renderPlayerPublicAnswers(answers);
-      });
-    }
-
-    function renderPlayerPublicAnswers(answers) {
-      const container = document.getElementById("player-public-answers");
-      container.innerHTML = "";
-
-      TEAMS.forEach(team => {
-        const data = answers[team];
-        if (data && data.isPublic) {
-          const div = document.createElement("div");
-          const isDup = data.isDuplicate;
-          div.className = `p-2 rounded border font-bold text-center ${isDup ? 'bg-rose-100 text-rose-800 border-rose-300' : 'bg-slate-50 border-slate-200'}`;
-          div.textContent = `${team}班: ${data.text} ${isDup ? '(カブり!)' : ''}`;
-          container.appendChild(div);
-        }
-      });
-    }
-
-    async function submitAnswer() {
-      const text = document.getElementById("player-input").value.trim();
-      if (!text) return;
-
-      await db.collection("answers").doc(myTeam).set({
-        text: text,
-        isPublic: false,
-        isDuplicate: false,
-        isCorrect: false
-      }, { merge: true });
-    }
-  </script>
-</body>
-</html>
+        await db.collection("answers").doc(team).
