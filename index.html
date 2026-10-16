@@ -1,460 +1,431 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2775.1">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 20.0px 'Helvetica Neue'; min-height: 25.0px}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 13.0px 'Helvetica Neue'; min-height: 15.0px}
-    p.p3 {margin: 0.0px 0.0px 0.0px 0.0px; font: 13.0px 'Helvetica Neue'}
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unique Answer Quiz System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 </head>
-<body>
-<p class="p1"><b></b><br></p>
-<p class="p2"><br></p>
-<p class="p2"><br></p>
-<p class="p3">&lt;!DOCTYPE html&gt;</p>
-<p class="p3">&lt;html lang="ja"&gt;</p>
-<p class="p3">&lt;head&gt;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>&lt;meta charset="UTF-8"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>&lt;title&gt;Unique Answer Quiz System&lt;/title&gt;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>&lt;script src="https://cdn.tailwindcss.com"&gt;&lt;/script&gt;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>&lt;!-- Firebase SDK --&gt;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>&lt;script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"&gt;&lt;/script&gt;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>&lt;script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"&gt;&lt;/script&gt;</p>
-<p class="p3">&lt;/head&gt;</p>
-<p class="p3">&lt;body class="bg-slate-100 min-h-screen text-slate-800 font-sans p-4"&gt;</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">  </span>&lt;!-- ロール選択画面 --&gt;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>&lt;div id="setup-screen" class="max-w-md mx-auto bg-white p-6 rounded-xl shadow-md space-y-4 mt-10"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">    </span>&lt;h1 class="text-xl font-bold text-center border-b pb-2"&gt;クイズシステム初期設定&lt;/h1&gt;</p>
-<p class="p2"><span class="Apple-converted-space">    </span></p>
-<p class="p3"><span class="Apple-converted-space">    </span>&lt;div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;label class="block text-sm font-medium mb-1"&gt;モード選択&lt;/label&gt;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;select id="role-select" class="w-full border rounded p-2" onchange="toggleTeamSelect()"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;option value="mc"&gt;MC（パソコン用）&lt;/option&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;option value="player"&gt;回答者（スマホ用）&lt;/option&gt;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;/select&gt;</p>
-<p class="p3"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">    </span>&lt;div id="team-select-container" class="hidden"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;label class="block text-sm font-medium mb-1"&gt;班の選択&lt;/label&gt;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;select id="team-select" class="w-full border rounded p-2"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;option value="A"&gt;A班&lt;/option&gt;&lt;option value="B"&gt;B班&lt;/option&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;option value="C"&gt;C班&lt;/option&gt;&lt;option value="D"&gt;D班&lt;/option&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;option value="E"&gt;E班&lt;/option&gt;&lt;option value="F"&gt;F班&lt;/option&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;option value="G"&gt;G班&lt;/option&gt;&lt;option value="H"&gt;H班&lt;/option&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;option value="I"&gt;I班&lt;/option&gt;&lt;option value="J"&gt;J班&lt;/option&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;option value="K"&gt;K班&lt;/option&gt;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;/select&gt;</p>
-<p class="p3"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">    </span>&lt;button onclick="startApp()" class="w-full bg-blue-600 text-white font-bold py-2 rounded hover:bg-blue-700"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>スタート</p>
-<p class="p3"><span class="Apple-converted-space">    </span>&lt;/button&gt;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">  </span>&lt;!-- MC 画面 --&gt;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>&lt;div id="mc-screen" class="hidden max-w-5xl mx-auto space-y-6"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">    </span>&lt;div class="bg-white p-4 rounded-xl shadow flex justify-between items-center"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;span class="text-sm text-slate-500"&gt;現在の問題&lt;/span&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;h2 id="mc-q-num" class="text-2xl font-bold"&gt;第 1 問&lt;/h2&gt;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;div id="mc-status-badge" class="px-3 py-1 bg-gray-200 text-gray-700 rounded-full text-sm font-bold"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>待機中</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">    </span>&lt;div class="bg-white p-6 rounded-xl shadow space-y-4"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;h3 id="mc-q-text" class="text-lg font-bold"&gt;問題文がここに表示されます&lt;/h3&gt;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;p id="mc-q-answers" class="text-sm text-emerald-600"&gt;想定解: -&lt;/p&gt;</p>
-<p class="p2"><span class="Apple-converted-space">      </span></p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;div class="flex flex-wrap gap-2 pt-2 border-t"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;button onclick="setStatus('open')" class="bg-emerald-600 text-white px-4 py-2 rounded font-bold hover:bg-emerald-700"&gt;回答受付開始&lt;/button&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;button onclick="setStatus('closed')" class="bg-rose-600 text-white px-4 py-2 rounded font-bold hover:bg-rose-700"&gt;回答締切&lt;/button&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;button onclick="checkDuplicates()" class="bg-amber-500 text-white px-4 py-2 rounded font-bold hover:bg-amber-600"&gt;カブり自動チェック&lt;/button&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;button onclick="finalizeScore()" class="bg-indigo-600 text-white px-4 py-2 rounded font-bold hover:bg-indigo-700"&gt;結果確定・加点&lt;/button&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;button onclick="nextQuestion()" class="bg-slate-700 text-white px-4 py-2 rounded font-bold hover:bg-slate-800"&gt;次の問題へ&lt;/button&gt;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">    </span>&lt;!-- 11班の回答状況テーブル --&gt;</p>
-<p class="p3"><span class="Apple-converted-space">    </span>&lt;div class="bg-white p-6 rounded-xl shadow"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;h3 class="font-bold mb-4"&gt;各班の回答・状況一覧&lt;/h3&gt;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;div class="overflow-x-auto"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;table class="w-full text-left border-collapse"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">          </span>&lt;thead&gt;</p>
-<p class="p3"><span class="Apple-converted-space">            </span>&lt;tr class="border-b bg-slate-50 text-sm"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">              </span>&lt;th class="p-2"&gt;班&lt;/th&gt;</p>
-<p class="p3"><span class="Apple-converted-space">              </span>&lt;th class="p-2"&gt;回答内容&lt;/th&gt;</p>
-<p class="p3"><span class="Apple-converted-space">              </span>&lt;th class="p-2 text-center"&gt;公開&lt;/th&gt;</p>
-<p class="p3"><span class="Apple-converted-space">              </span>&lt;th class="p-2 text-center"&gt;カブり&lt;/th&gt;</p>
-<p class="p3"><span class="Apple-converted-space">              </span>&lt;th class="p-2 text-center"&gt;正誤&lt;/th&gt;</p>
-<p class="p3"><span class="Apple-converted-space">            </span>&lt;/tr&gt;</p>
-<p class="p3"><span class="Apple-converted-space">          </span>&lt;/thead&gt;</p>
-<p class="p3"><span class="Apple-converted-space">          </span>&lt;tbody id="mc-answers-table"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">            </span>&lt;!-- JavaScriptで動的生成 --&gt;</p>
-<p class="p3"><span class="Apple-converted-space">          </span>&lt;/tbody&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;/table&gt;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">    </span>&lt;!-- 順位・累計得点一覧 --&gt;</p>
-<p class="p3"><span class="Apple-converted-space">    </span>&lt;div class="bg-white p-6 rounded-xl shadow"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;h3 class="font-bold mb-4"&gt;現在順位・累計得点&lt;/h3&gt;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;div id="mc-leaderboard" class="grid grid-cols-2 md:grid-cols-4 gap-2"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;!-- JavaScriptで動的生成 --&gt;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">  </span>&lt;!-- 回答者（スマホ）画面 --&gt;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>&lt;div id="player-screen" class="hidden max-w-md mx-auto space-y-4"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">    </span>&lt;!-- ヘッダー（班名常時表示） --&gt;</p>
-<p class="p3"><span class="Apple-converted-space">    </span>&lt;div class="bg-indigo-600 text-white p-4 rounded-xl shadow flex justify-between items-center"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;span class="text-sm"&gt;参加中&lt;/span&gt;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;span id="player-team-badge" class="text-2xl font-black"&gt;A 班&lt;/span&gt;</p>
-<p class="p3"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">    </span>&lt;!-- 問題表示 --&gt;</p>
-<p class="p3"><span class="Apple-converted-space">    </span>&lt;div class="bg-white p-6 rounded-xl shadow space-y-2"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;div class="flex justify-between items-center"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;span id="player-q-num" class="font-bold text-indigo-600"&gt;第 1 問&lt;/span&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;span id="player-status-badge" class="text-xs px-2 py-1 bg-gray-100 rounded"&gt;待機中&lt;/span&gt;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;p id="player-q-text" class="text-base font-medium"&gt;MCが回答を開始するまでお待ちください。&lt;/p&gt;</p>
-<p class="p3"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">    </span>&lt;!-- 回答入力フォーム --&gt;</p>
-<p class="p3"><span class="Apple-converted-space">    </span>&lt;div class="bg-white p-6 rounded-xl shadow space-y-4"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;input type="text" id="player-input" placeholder="回答を入力" class="w-full border-2 border-slate-300 rounded-lg p-3 text-lg focus:border-indigo-500 outline-none"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;button id="player-submit-btn" onclick="submitAnswer()" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg text-lg hover:bg-indigo-700 disabled:opacity-50"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>送信する</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;/button&gt;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;p id="player-submitted-msg" class="text-sm text-center text-emerald-600 font-bold hidden"&gt;送信完了しました（変更不可）&lt;/p&gt;</p>
-<p class="p3"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">    </span>&lt;!-- 公開された全班の回答一覧 --&gt;</p>
-<p class="p3"><span class="Apple-converted-space">    </span>&lt;div class="bg-white p-6 rounded-xl shadow space-y-2"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;h4 class="text-sm font-bold border-b pb-1"&gt;みんなの回答（MC公開分）&lt;/h4&gt;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;div id="player-public-answers" class="grid grid-cols-2 gap-2 text-sm"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>&lt;!-- JavaScriptで動的生成 --&gt;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p3"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">  </span>&lt;script&gt;</p>
-<p class="p3"><span class="Apple-converted-space">    </span>// --- 1. Firebase 初期化設定 ---</p>
-<p class="p3"><span class="Apple-converted-space">    </span>// ※ Firebase Console で作成したプロジェクトの API キー等に差し替えてください</p>
-<p class="p3"><span class="Apple-converted-space">    </span>const firebaseConfig = {</p>
-<p class="p3"><span class="Apple-converted-space">  </span>apiKey: "AIzaSyC7Yb8ESqEuIZlW5KVYYvZDu1Iy1mW5cQY",</p>
-<p class="p3"><span class="Apple-converted-space">  </span>authDomain: "be-unique-e5413.firebaseapp.com",</p>
-<p class="p3"><span class="Apple-converted-space">  </span>projectId: "be-unique-e5413",</p>
-<p class="p3"><span class="Apple-converted-space">  </span>storageBucket: "be-unique-e5413.firebasestorage.app",</p>
-<p class="p3"><span class="Apple-converted-space">  </span>messagingSenderId: "323799901847",</p>
-<p class="p3"><span class="Apple-converted-space">  </span>appId: "1:323799901847:web:6be388333102640abcabd2",</p>
-<p class="p3"><span class="Apple-converted-space">  </span>measurementId: "G-4HHZHVCF07"</p>
-<p class="p3">};</p>
-<p class="p3"><span class="Apple-converted-space">    </span>firebase.initializeApp(firebaseConfig);</p>
-<p class="p3"><span class="Apple-converted-space">    </span>const db = firebase.firestore();</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">    </span>// --- 2. 事前登録問題（全8〜10問設定可能） ---</p>
-<p class="p3"><span class="Apple-converted-space">    </span>const quizQuestions = [</p>
-<p class="p3"><span class="Apple-converted-space">  </span>{</p>
-<p class="p3"><span class="Apple-converted-space">    </span>id: 1,</p>
-<p class="p3"><span class="Apple-converted-space">    </span>text: "「世界の面積ランキングトップ10に入る国」といえば？ Name a country in the top 10 largest countries by area!",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>answers: [</p>
-<p class="p3"><span class="Apple-converted-space">      </span>"ロシア", "ロシア連邦", "カナダ", "アメリカ", "アメリカ合衆国", "中国", "中華人民共和国",<span class="Apple-converted-space"> </span></p>
-<p class="p3"><span class="Apple-converted-space">      </span>"ブラジル", "ブラジル連邦共和国", "オーストラリア", "オーストラリア連邦", "インド",<span class="Apple-converted-space"> </span></p>
-<p class="p3"><span class="Apple-converted-space">      </span>"アルゼンチン", "アルゼンチン共和国", "カザフスタン", "カザフスタン共和国", "アルジェリア", "アルジェリア民主人民共和国",</p>
-<p class="p3"><span class="Apple-converted-space">      </span>"Russia", "Russian Federation", "Canada", "United States", "United States of America", "USA",<span class="Apple-converted-space"> </span></p>
-<p class="p3"><span class="Apple-converted-space">      </span>"China", "Brazil", "Australia", "India", "Argentina", "Kazakhstan", "Algeria"</p>
-<p class="p3"><span class="Apple-converted-space">    </span>]</p>
-<p class="p3"><span class="Apple-converted-space">  </span>},</p>
-<p class="p3"><span class="Apple-converted-space">  </span>{</p>
-<p class="p3"><span class="Apple-converted-space">    </span>id: 2,</p>
-<p class="p3"><span class="Apple-converted-space">    </span>text: "「赤い果物」といえば？ Name a red fruit!",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>answers: [</p>
-<p class="p3"><span class="Apple-converted-space">      </span>"りんご", "リンゴ", "イチゴ", "いちご", "苺", "さくらんぼ", "サクランボ", "チェリー",<span class="Apple-converted-space"> </span></p>
-<p class="p3"><span class="Apple-converted-space">      </span>"トマト", "スイカ", "すいか", "西瓜", "ラズベリー", "ザクロ", "ざくろ", "アセロラ",</p>
-<p class="p3"><span class="Apple-converted-space">      </span>"Apple", "Strawberry", "Cherry", "Tomato", "Watermelon", "Raspberry", "Pomegranate", "Acerola"</p>
-<p class="p3"><span class="Apple-converted-space">    </span>]</p>
-<p class="p3"><span class="Apple-converted-space">  </span>},</p>
-<p class="p3"><span class="Apple-converted-space">  </span>{</p>
-<p class="p3"><span class="Apple-converted-space">    </span>id: 3,</p>
-<p class="p3"><span class="Apple-converted-space">    </span>text: "「118種の元素記号に使われているアルファベット頻出トップ9」といえば？ Name one of the top 9 most frequent letters used in element symbols!",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>answers: [</p>
-<p class="p3"><span class="Apple-converted-space">      </span>"R", "r", "A", "a", "C", "c", "S", "s", "N", "n", "B", "b", "E", "e", "M", "m", "T", "t"</p>
-<p class="p3"><span class="Apple-converted-space">    </span>]</p>
-<p class="p3"><span class="Apple-converted-space">  </span>},</p>
-<p class="p3"><span class="Apple-converted-space">  </span>{</p>
-<p class="p3"><span class="Apple-converted-space">    </span>id: 4,</p>
-<p class="p3"><span class="Apple-converted-space">    </span>text: "「太陽系の惑星」といえば？ Name a planet in our Solar System!",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>answers: [</p>
-<p class="p3"><span class="Apple-converted-space">      </span>"水星", "金星", "地球", "火星", "木星", "土星", "天王星", "海王星",</p>
-<p class="p3"><span class="Apple-converted-space">      </span>"Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"</p>
-<p class="p3"><span class="Apple-converted-space">    </span>]</p>
-<p class="p3"><span class="Apple-converted-space">  </span>},</p>
-<p class="p3"><span class="Apple-converted-space">  </span>{</p>
-<p class="p3"><span class="Apple-converted-space">    </span>id: 5,</p>
-<p class="p3"><span class="Apple-converted-space">    </span>text: "「理農館5階に存在する部屋の番号」といえば？ Name a room number located on the 5th floor of Rinokan!",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>answers: [</p>
-<p class="p3"><span class="Apple-converted-space">      </span>"SA501", "SA502", "SA515", "SA516", "SA518", "SA519", "SA521",<span class="Apple-converted-space"> </span></p>
-<p class="p3"><span class="Apple-converted-space">      </span>"SA522-1", "SA522-2", "SA522_1", "SA522_2",</p>
-<p class="p3"><span class="Apple-converted-space">      </span>"SA526", "SA528", "SA529", "SA531", "SA533", "SA538",</p>
-<p class="p3"><span class="Apple-converted-space">      </span>"sa501", "sa502", "sa515", "sa516", "sa518", "sa519", "sa521",<span class="Apple-converted-space"> </span></p>
-<p class="p3"><span class="Apple-converted-space">      </span>"sa522-1", "sa522-2", "sa522_1", "sa522_2",</p>
-<p class="p3"><span class="Apple-converted-space">      </span>"sa526", "sa528", "sa529", "sa531", "sa533", "sa538"</p>
-<p class="p3"><span class="Apple-converted-space">    </span>]</p>
-<p class="p3"><span class="Apple-converted-space">  </span>},</p>
-<p class="p3"><span class="Apple-converted-space">  </span>{</p>
-<p class="p3"><span class="Apple-converted-space">    </span>id: 6,</p>
-<p class="p3"><span class="Apple-converted-space">    </span>text: "「八木研のLab Motto」に含まれる英単語といえば？ Name an English word included in the Yagi Lab Motto!",</p>
-<p class="p3"><span class="Apple-converted-space">    </span>answers: [</p>
-<p class="p3"><span class="Apple-converted-space">      </span>"Be", "be", "BE",<span class="Apple-converted-space"> </span></p>
-<p class="p3"><span class="Apple-converted-space">      </span>"Unique", "unique", "UNIQUE",<span class="Apple-converted-space"> </span></p>
-<p class="p3"><span class="Apple-converted-space">      </span>"Go", "go", "GO",<span class="Apple-converted-space"> </span></p>
-<p class="p3"><span class="Apple-converted-space">      </span>"Hungry", "hungry", "HUNGRY",<span class="Apple-converted-space"> </span></p>
-<p class="p3"><span class="Apple-converted-space">      </span>"Interact", "interact", "INTERACT",<span class="Apple-converted-space"> </span></p>
-<p class="p3"><span class="Apple-converted-space">      </span>"with", "With", "WITH",<span class="Apple-converted-space"> </span></p>
-<p class="p3"><span class="Apple-converted-space">      </span>"the", "The", "THE",<span class="Apple-converted-space"> </span></p>
-<p class="p3"><span class="Apple-converted-space">      </span>"World", "world", "WORLD"</p>
-<p class="p3"><span class="Apple-converted-space">    </span>]</p>
-<p class="p3"><span class="Apple-converted-space">  </span>}</p>
-<p class="p3">];</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">    </span>const TEAMS = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"];</p>
-<p class="p3"><span class="Apple-converted-space">    </span>let currentRole = "";</p>
-<p class="p3"><span class="Apple-converted-space">    </span>let myTeam = "";</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">    </span>function toggleTeamSelect() {</p>
-<p class="p3"><span class="Apple-converted-space">      </span>const role = document.getElementById("role-select").value;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>document.getElementById("team-select-container").classList.toggle("hidden", role !== "player");</p>
-<p class="p3"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">    </span>async function startApp() {</p>
-<p class="p3"><span class="Apple-converted-space">      </span>currentRole = document.getElementById("role-select").value;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>myTeam = document.getElementById("team-select").value;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>document.getElementById("setup-screen").classList.add("hidden");</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">      </span>if (currentRole === "mc") {</p>
-<p class="p3"><span class="Apple-converted-space">        </span>document.getElementById("mc-screen").classList.remove("hidden");</p>
-<p class="p3"><span class="Apple-converted-space">        </span>initMC();</p>
-<p class="p3"><span class="Apple-converted-space">      </span>} else {</p>
-<p class="p3"><span class="Apple-converted-space">        </span>document.getElementById("player-screen").classList.remove("hidden");</p>
-<p class="p3"><span class="Apple-converted-space">        </span>document.getElementById("player-team-badge").textContent = `${myTeam} 班`;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>initPlayer();</p>
-<p class="p3"><span class="Apple-converted-space">      </span>}</p>
-<p class="p3"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">    </span>// --- 3. MC ロジック ---</p>
-<p class="p3"><span class="Apple-converted-space">    </span>function initMC() {</p>
-<p class="p3"><span class="Apple-converted-space">      </span>// 部屋の初期状態同期</p>
-<p class="p3"><span class="Apple-converted-space">      </span>db.collection("game").doc("state").onSnapshot(doc =&gt; {</p>
-<p class="p3"><span class="Apple-converted-space">        </span>if (!doc.exists) return;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>const state = doc.data();</p>
-<p class="p3"><span class="Apple-converted-space">        </span>const qIndex = state.currentQIndex || 0;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>const q = quizQuestions[qIndex];</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">        </span>document.getElementById("mc-q-num").textContent = `第 ${qIndex + 1} 問 / 全 ${quizQuestions.length} 問`;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>document.getElementById("mc-q-text").textContent = q.text;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>document.getElementById("mc-q-answers").textContent = `想定解: ${q.answers.join(", ")}`;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>document.getElementById("mc-status-badge").textContent =<span class="Apple-converted-space"> </span></p>
-<p class="p3"><span class="Apple-converted-space">          </span>state.status === "open" ? "回答受付中" : state.status === "closed" ? "締切" : "待機中";</p>
-<p class="p3"><span class="Apple-converted-space">      </span>});</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">      </span>// 回答・状況のリアルタイム監視</p>
-<p class="p3"><span class="Apple-converted-space">      </span>db.collection("answers").onSnapshot(snapshot =&gt; {</p>
-<p class="p3"><span class="Apple-converted-space">        </span>const answers = {};</p>
-<p class="p3"><span class="Apple-converted-space">        </span>snapshot.forEach(doc =&gt; { answers[doc.id] = doc.data(); });</p>
-<p class="p3"><span class="Apple-converted-space">        </span>renderMCTable(answers);</p>
-<p class="p3"><span class="Apple-converted-space">      </span>});</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">      </span>// スコアのリアルタイム監視</p>
-<p class="p3"><span class="Apple-converted-space">      </span>db.collection("scores").onSnapshot(snapshot =&gt; {</p>
-<p class="p3"><span class="Apple-converted-space">        </span>const scores = {};</p>
-<p class="p3"><span class="Apple-converted-space">        </span>snapshot.forEach(doc =&gt; { scores[doc.id] = doc.data().score || 0; });</p>
-<p class="p3"><span class="Apple-converted-space">        </span>renderMCLeaderboard(scores);</p>
-<p class="p3"><span class="Apple-converted-space">      </span>});</p>
-<p class="p3"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">    </span>function renderMCTable(answers) {</p>
-<p class="p3"><span class="Apple-converted-space">      </span>const tbody = document.getElementById("mc-answers-table");</p>
-<p class="p3"><span class="Apple-converted-space">      </span>tbody.innerHTML = "";</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">      </span>TEAMS.forEach(team =&gt; {</p>
-<p class="p3"><span class="Apple-converted-space">        </span>const data = answers[team] || { text: "", isPublic: false, isDuplicate: false, isCorrect: false };</p>
-<p class="p3"><span class="Apple-converted-space">        </span>const tr = document.createElement("tr");</p>
-<p class="p3"><span class="Apple-converted-space">        </span>tr.className = "border-b text-sm";</p>
-<p class="p3"><span class="Apple-converted-space">        </span>tr.innerHTML = `</p>
-<p class="p3"><span class="Apple-converted-space">          </span>&lt;td class="p-2 font-bold"&gt;${team}班&lt;/td&gt;</p>
-<p class="p3"><span class="Apple-converted-space">          </span>&lt;td class="p-2"&gt;${data.text || '&lt;span class="text-gray-400"&gt;未送信&lt;/span&gt;'}&lt;/td&gt;</p>
-<p class="p3"><span class="Apple-converted-space">          </span>&lt;td class="p-2 text-center"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">            </span>&lt;input type="checkbox" ${data.isPublic ? 'checked' : ''} onchange="updateAnswerFlag('${team}', 'isPublic', this.checked)"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">          </span>&lt;/td&gt;</p>
-<p class="p3"><span class="Apple-converted-space">          </span>&lt;td class="p-2 text-center"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">            </span>&lt;input type="checkbox" ${data.isDuplicate ? 'checked' : ''} onchange="updateAnswerFlag('${team}', 'isDuplicate', this.checked)"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">          </span>&lt;/td&gt;</p>
-<p class="p3"><span class="Apple-converted-space">          </span>&lt;td class="p-2 text-center"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">            </span>&lt;input type="checkbox" ${data.isCorrect ? 'checked' : ''} onchange="updateAnswerFlag('${team}', 'isCorrect', this.checked)"&gt;</p>
-<p class="p3"><span class="Apple-converted-space">          </span>&lt;/td&gt;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>`;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>tbody.appendChild(tr);</p>
-<p class="p3"><span class="Apple-converted-space">      </span>});</p>
-<p class="p3"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">    </span>function renderMCLeaderboard(scores) {</p>
-<p class="p3"><span class="Apple-converted-space">      </span>const container = document.getElementById("mc-leaderboard");</p>
-<p class="p3"><span class="Apple-converted-space">      </span>container.innerHTML = "";</p>
-<p class="p2"><span class="Apple-converted-space">      </span></p>
-<p class="p3"><span class="Apple-converted-space">      </span>const sorted = TEAMS.map(t =&gt; ({ team: t, score: scores[t] || 0 }))</p>
-<p class="p3"><span class="Apple-converted-space">                          </span>.sort((a, b) =&gt; b.score - a.score);</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">      </span>sorted.forEach((item, index) =&gt; {</p>
-<p class="p3"><span class="Apple-converted-space">        </span>const div = document.createElement("div");</p>
-<p class="p3"><span class="Apple-converted-space">        </span>div.className = "p-2 bg-slate-50 rounded border text-center";</p>
-<p class="p3"><span class="Apple-converted-space">        </span>div.innerHTML = `&lt;span class="text-xs text-gray-500"&gt;${index + 1}位&lt;/span&gt; &lt;strong class="block"&gt;${item.team}班: ${item.score}pt&lt;/strong&gt;`;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>container.appendChild(div);</p>
-<p class="p3"><span class="Apple-converted-space">      </span>});</p>
-<p class="p3"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">    </span>async function setStatus(status) {</p>
-<p class="p3"><span class="Apple-converted-space">      </span>await db.collection("game").doc("state").set({ status }, { merge: true });</p>
-<p class="p3"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">    </span>async function updateAnswerFlag(team, field, value) {</p>
-<p class="p3"><span class="Apple-converted-space">      </span>await db.collection("answers").doc(team).set({ [field]: value }, { merge: true });</p>
-<p class="p3"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">    </span>// カブり・自動正誤判定ロジック</p>
-<p class="p3"><span class="Apple-converted-space">    </span>async function checkDuplicates() {</p>
-<p class="p3"><span class="Apple-converted-space">      </span>const stateDoc = await db.collection("game").doc("state").get();</p>
-<p class="p3"><span class="Apple-converted-space">      </span>const qIndex = stateDoc.data().currentQIndex || 0;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>const validAnswers = quizQuestions[qIndex].answers.map(a =&gt; a.trim().toLowerCase());</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">      </span>const snapshot = await db.collection("answers").get();</p>
-<p class="p3"><span class="Apple-converted-space">      </span>const countMap = {};</p>
-<p class="p3"><span class="Apple-converted-space">      </span>const teamAnswers = {};</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">      </span>snapshot.forEach(doc =&gt; {</p>
-<p class="p3"><span class="Apple-converted-space">        </span>const text = (doc.data().text || "").trim().toLowerCase();</p>
-<p class="p3"><span class="Apple-converted-space">        </span>teamAnswers[doc.id] = text;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>if (text) countMap[text] = (countMap[text] || 0) + 1;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>});</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">      </span>TEAMS.forEach(async team =&gt; {</p>
-<p class="p3"><span class="Apple-converted-space">        </span>const ans = teamAnswers[team];</p>
-<p class="p3"><span class="Apple-converted-space">        </span>const isDuplicate = ans ? countMap[ans] &gt; 1 : false;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>const isCorrect = ans ? validAnswers.includes(ans) : false;</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">        </span>await db.collection("answers").doc(team).set({</p>
-<p class="p3"><span class="Apple-converted-space">          </span>isDuplicate: isDuplicate,</p>
-<p class="p3"><span class="Apple-converted-space">          </span>isCorrect: isCorrect &amp;&amp; !isDuplicate // カブっていない正解のみ自動正解扱い</p>
-<p class="p3"><span class="Apple-converted-space">        </span>}, { merge: true });</p>
-<p class="p3"><span class="Apple-converted-space">      </span>});</p>
-<p class="p3"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">    </span>async function finalizeScore() {</p>
-<p class="p3"><span class="Apple-converted-space">      </span>const snapshot = await db.collection("answers").get();</p>
-<p class="p3"><span class="Apple-converted-space">      </span>snapshot.forEach(async doc =&gt; {</p>
-<p class="p3"><span class="Apple-converted-space">        </span>const data = doc.data();</p>
-<p class="p3"><span class="Apple-converted-space">        </span>if (data.isCorrect &amp;&amp; !data.isDuplicate) {</p>
-<p class="p3"><span class="Apple-converted-space">          </span>const scoreDoc = await db.collection("scores").doc(doc.id).get();</p>
-<p class="p3"><span class="Apple-converted-space">          </span>const currentScore = (scoreDoc.exists ? scoreDoc.data().score : 0) || 0;</p>
-<p class="p3"><span class="Apple-converted-space">          </span>await db.collection("scores").doc(doc.id).set({ score: currentScore + 1 });</p>
-<p class="p3"><span class="Apple-converted-space">        </span>}</p>
-<p class="p3"><span class="Apple-converted-space">      </span>});</p>
-<p class="p3"><span class="Apple-converted-space">      </span>alert("ポイントの加算が完了しました。");</p>
-<p class="p3"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">    </span>async function nextQuestion() {</p>
-<p class="p3"><span class="Apple-converted-space">      </span>const stateDoc = await db.collection("game").doc("state").get();</p>
-<p class="p3"><span class="Apple-converted-space">      </span>const nextIndex = (stateDoc.data().currentQIndex || 0) + 1;</p>
-<p class="p2"><span class="Apple-converted-space">      </span></p>
-<p class="p3"><span class="Apple-converted-space">      </span>if (nextIndex &gt;= quizQuestions.length) {</p>
-<p class="p3"><span class="Apple-converted-space">        </span>alert("全問題が終了しました。");</p>
-<p class="p3"><span class="Apple-converted-space">        </span>return;</p>
-<p class="p3"><span class="Apple-converted-space">      </span>}</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">      </span>// 次の問題へ進み、各班の回答フラグをリセット</p>
-<p class="p3"><span class="Apple-converted-space">      </span>await db.collection("game").doc("state").set({ currentQIndex: nextIndex, status: "waiting" });</p>
-<p class="p3"><span class="Apple-converted-space">      </span>TEAMS.forEach(async team =&gt; {</p>
-<p class="p3"><span class="Apple-converted-space">        </span>await db.collection("answers").doc(team).set({ text: "", isPublic: false, isDuplicate: false, isCorrect: false });</p>
-<p class="p3"><span class="Apple-converted-space">      </span>});</p>
-<p class="p3"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">    </span>// --- 4. 回答者 ロジック ---</p>
-<p class="p3"><span class="Apple-converted-space">    </span>function initPlayer() {</p>
-<p class="p3"><span class="Apple-converted-space">      </span>// 部屋の状況をリアルタイム同期</p>
-<p class="p3"><span class="Apple-converted-space">      </span>db.collection("game").doc("state").onSnapshot(doc =&gt; {</p>
-<p class="p3"><span class="Apple-converted-space">        </span>if (!doc.exists) return;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>const state = doc.data();</p>
-<p class="p3"><span class="Apple-converted-space">        </span>const qIndex = state.currentQIndex || 0;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>const q = quizQuestions[qIndex];</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">        </span>document.getElementById("player-q-num").textContent = `第 ${qIndex + 1} 問`;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>document.getElementById("player-q-text").textContent = q.text;</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">        </span>const isClosed = state.status !== "open";</p>
-<p class="p3"><span class="Apple-converted-space">        </span>document.getElementById("player-input").disabled = isClosed;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>document.getElementById("player-submit-btn").disabled = isClosed;</p>
-<p class="p3"><span class="Apple-converted-space">        </span>document.getElementById("player-status-badge").textContent =<span class="Apple-converted-space"> </span></p>
-<p class="p3"><span class="Apple-converted-space">          </span>state.status === "open" ? "受付中" : "受付停止中";</p>
-<p class="p3"><span class="Apple-converted-space">      </span>});</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">      </span>// 公開された回答をリアルタイム同期</p>
-<p class="p3"><span class="Apple-converted-space">      </span>db.collection("answers").onSnapshot(snapshot =&gt; {</p>
-<p class="p3"><span class="Apple-converted-space">        </span>const answers = {};</p>
-<p class="p3"><span class="Apple-converted-space">        </span>snapshot.forEach(doc =&gt; { answers[doc.id] = doc.data(); });</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">        </span>// 自分の送信状態確認</p>
-<p class="p3"><span class="Apple-converted-space">        </span>if (answers[myTeam] &amp;&amp; answers[myTeam].text) {</p>
-<p class="p3"><span class="Apple-converted-space">          </span>document.getElementById("player-input").value = answers[myTeam].text;</p>
-<p class="p3"><span class="Apple-converted-space">          </span>document.getElementById("player-input").disabled = true;</p>
-<p class="p3"><span class="Apple-converted-space">          </span>document.getElementById("player-submit-btn").disabled = true;</p>
-<p class="p3"><span class="Apple-converted-space">          </span>document.getElementById("player-submitted-msg").classList.remove("hidden");</p>
-<p class="p3"><span class="Apple-converted-space">        </span>} else {</p>
-<p class="p3"><span class="Apple-converted-space">          </span>document.getElementById("player-submitted-msg").classList.add("hidden");</p>
-<p class="p3"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">        </span>renderPlayerPublicAnswers(answers);</p>
-<p class="p3"><span class="Apple-converted-space">      </span>});</p>
-<p class="p3"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">    </span>function renderPlayerPublicAnswers(answers) {</p>
-<p class="p3"><span class="Apple-converted-space">      </span>const container = document.getElementById("player-public-answers");</p>
-<p class="p3"><span class="Apple-converted-space">      </span>container.innerHTML = "";</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">      </span>TEAMS.forEach(team =&gt; {</p>
-<p class="p3"><span class="Apple-converted-space">        </span>const data = answers[team];</p>
-<p class="p3"><span class="Apple-converted-space">        </span>if (data &amp;&amp; data.isPublic) {</p>
-<p class="p3"><span class="Apple-converted-space">          </span>const div = document.createElement("div");</p>
-<p class="p3"><span class="Apple-converted-space">          </span>const isDup = data.isDuplicate;</p>
-<p class="p3"><span class="Apple-converted-space">          </span>div.className = `p-2 rounded border font-bold text-center ${isDup ? 'bg-rose-100 text-rose-800 border-rose-300' : 'bg-slate-50 border-slate-200'}`;</p>
-<p class="p3"><span class="Apple-converted-space">          </span>div.textContent = `${team}班: ${data.text} ${isDup ? '(カブり!)' : ''}`;</p>
-<p class="p3"><span class="Apple-converted-space">          </span>container.appendChild(div);</p>
-<p class="p3"><span class="Apple-converted-space">        </span>}</p>
-<p class="p3"><span class="Apple-converted-space">      </span>});</p>
-<p class="p3"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">    </span>async function submitAnswer() {</p>
-<p class="p3"><span class="Apple-converted-space">      </span>const text = document.getElementById("player-input").value.trim();</p>
-<p class="p3"><span class="Apple-converted-space">      </span>if (!text) return;</p>
-<p class="p2"><br></p>
-<p class="p3"><span class="Apple-converted-space">      </span>await db.collection("answers").doc(myTeam).set({</p>
-<p class="p3"><span class="Apple-converted-space">        </span>text: text,</p>
-<p class="p3"><span class="Apple-converted-space">        </span>isPublic: false,</p>
-<p class="p3"><span class="Apple-converted-space">        </span>isDuplicate: false,</p>
-<p class="p3"><span class="Apple-converted-space">        </span>isCorrect: false</p>
-<p class="p3"><span class="Apple-converted-space">      </span>}, { merge: true });</p>
-<p class="p3"><span class="Apple-converted-space">    </span>}</p>
-<p class="p3"><span class="Apple-converted-space">  </span>&lt;/script&gt;</p>
-<p class="p3">&lt;/body&gt;</p>
-<p class="p3">&lt;/html&gt;</p>
+<body class="bg-slate-100 min-h-screen text-slate-800 font-sans p-4">
+
+  <!-- ロール選択画面 -->
+  <div id="setup-screen" class="max-w-md mx-auto bg-white p-6 rounded-xl shadow-md space-y-4 mt-10">
+    <h1 class="text-xl font-bold text-center border-b pb-2">クイズシステム初期設定</h1>
+    
+    <div>
+      <label class="block text-sm font-medium mb-1">モード選択</label>
+      <select id="role-select" class="w-full border rounded p-2" onchange="toggleTeamSelect()">
+        <option value="mc">MC（パソコン用）</option>
+        <option value="player">回答者（スマホ用）</option>
+      </select>
+    </div>
+
+    <div id="team-select-container" class="hidden">
+      <label class="block text-sm font-medium mb-1">班の選択</label>
+      <select id="team-select" class="w-full border rounded p-2">
+        <option value="A">A班</option><option value="B">B班</option>
+        <option value="C">C班</option><option value="D">D班</option>
+        <option value="E">E班</option><option value="F">F班</option>
+        <option value="G">G班</option><option value="H">H班</option>
+        <option value="I">I班</option><option value="J">J班</option>
+        <option value="K">K班</option>
+      </select>
+    </div>
+
+    <button onclick="startApp()" class="w-full bg-blue-600 text-white font-bold py-2 rounded hover:bg-blue-700">
+      スタート
+    </button>
+  </div>
+
+  <!-- MC 画面 -->
+  <div id="mc-screen" class="hidden max-w-5xl mx-auto space-y-6">
+    <div class="bg-white p-4 rounded-xl shadow flex justify-between items-center">
+      <div>
+        <span class="text-sm text-slate-500">現在の問題</span>
+        <h2 id="mc-q-num" class="text-2xl font-bold">第 1 問</h2>
+      </div>
+      <div id="mc-status-badge" class="px-3 py-1 bg-gray-200 text-gray-700 rounded-full text-sm font-bold">
+        待機中
+      </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-xl shadow space-y-4">
+      <h3 id="mc-q-text" class="text-lg font-bold">問題文がここに表示されます</h3>
+      <p id="mc-q-answers" class="text-sm text-emerald-600">想定解: -</p>
+      
+      <div class="flex flex-wrap gap-2 pt-2 border-t">
+        <button onclick="setStatus('open')" class="bg-emerald-600 text-white px-4 py-2 rounded font-bold hover:bg-emerald-700">回答受付開始</button>
+        <button onclick="setStatus('closed')" class="bg-rose-600 text-white px-4 py-2 rounded font-bold hover:bg-rose-700">回答締切</button>
+        <button onclick="checkDuplicates()" class="bg-amber-500 text-white px-4 py-2 rounded font-bold hover:bg-amber-600">カブり自動チェック</button>
+        <button onclick="finalizeScore()" class="bg-indigo-600 text-white px-4 py-2 rounded font-bold hover:bg-indigo-700">結果確定・加点</button>
+        <button onclick="nextQuestion()" class="bg-slate-700 text-white px-4 py-2 rounded font-bold hover:bg-slate-800">次の問題へ</button>
+      </div>
+    </div>
+
+    <!-- 11班の回答状況テーブル -->
+    <div class="bg-white p-6 rounded-xl shadow">
+      <h3 class="font-bold mb-4">各班の回答・状況一覧</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="border-b bg-slate-50 text-sm">
+              <th class="p-2">班</th>
+              <th class="p-2">回答内容</th>
+              <th class="p-2 text-center">公開</th>
+              <th class="p-2 text-center">カブり</th>
+              <th class="p-2 text-center">正誤</th>
+            </tr>
+          </thead>
+          <tbody id="mc-answers-table">
+            <!-- JavaScriptで動的生成 -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 順位・累計得点一覧 -->
+    <div class="bg-white p-6 rounded-xl shadow">
+      <h3 class="font-bold mb-4">現在順位・累計得点</h3>
+      <div id="mc-leaderboard" class="grid grid-cols-2 md:grid-cols-4 gap-2">
+        <!-- JavaScriptで動的生成 -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 回答者（スマホ）画面 -->
+  <div id="player-screen" class="hidden max-w-md mx-auto space-y-4">
+    <!-- ヘッダー（班名常時表示） -->
+    <div class="bg-indigo-600 text-white p-4 rounded-xl shadow flex justify-between items-center">
+      <span class="text-sm">参加中</span>
+      <span id="player-team-badge" class="text-2xl font-black">A 班</span>
+    </div>
+
+    <!-- 問題表示 -->
+    <div class="bg-white p-6 rounded-xl shadow space-y-2">
+      <div class="flex justify-between items-center">
+        <span id="player-q-num" class="font-bold text-indigo-600">第 1 問</span>
+        <span id="player-status-badge" class="text-xs px-2 py-1 bg-gray-100 rounded">待機中</span>
+      </div>
+      <p id="player-q-text" class="text-base font-medium">MCが回答を開始するまでお待ちください。</p>
+    </div>
+
+    <!-- 回答入力フォーム -->
+    <div class="bg-white p-6 rounded-xl shadow space-y-4">
+      <input type="text" id="player-input" placeholder="回答を入力" class="w-full border-2 border-slate-300 rounded-lg p-3 text-lg focus:border-indigo-500 outline-none">
+      <button id="player-submit-btn" onclick="submitAnswer()" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg text-lg hover:bg-indigo-700 disabled:opacity-50">
+        送信する
+      </button>
+      <p id="player-submitted-msg" class="text-sm text-center text-emerald-600 font-bold hidden">送信完了しました（変更不可）</p>
+    </div>
+
+    <!-- 公開された全班の回答一覧 -->
+    <div class="bg-white p-6 rounded-xl shadow space-y-2">
+      <h4 class="text-sm font-bold border-b pb-1">みんなの回答（MC公開分）</h4>
+      <div id="player-public-answers" class="grid grid-cols-2 gap-2 text-sm">
+        <!-- JavaScriptで動的生成 -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- 1. Firebase 初期化設定 ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyC7Yb8ESqEuIZlW5KVYYvZDu1Iy1mW5cQY",
+      authDomain: "be-unique-e5413.firebaseapp.com",
+      projectId: "be-unique-e5413",
+      storageBucket: "be-unique-e5413.firebasestorage.app",
+      messagingSenderId: "323799901847",
+      appId: "1:323799901847:web:6be388333102640abcabd2",
+      measurementId: "G-4HHZHVCF07"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // --- 2. 事前登録問題（全6問） ---
+    const quizQuestions = [
+      {
+        id: 1,
+        text: "「世界の面積ランキングトップ10に入る国」といえば？ Name a country in the top 10 largest countries by area!",
+        answers: [
+          "ロシア", "ロシア連邦", "カナダ", "アメリカ", "アメリカ合衆国", "中国", "中華人民共和国", 
+          "ブラジル", "ブラジル連邦共和国", "オーストラリア", "オーストラリア連邦", "インド", 
+          "アルゼンチン", "アルゼンチン共和国", "カザフスタン", "カザフスタン共和国", "アルジェリア", "アルジェリア民主人民共和国",
+          "Russia", "Russian Federation", "Canada", "United States", "United States of America", "USA", 
+          "China", "Brazil", "Australia", "India", "Argentina", "Kazakhstan", "Algeria"
+        ]
+      },
+      {
+        id: 2,
+        text: "「赤い果物」といえば？ Name a red fruit!",
+        answers: [
+          "りんご", "リンゴ", "イチゴ", "いちご", "苺", "さくらんぼ", "サクランボ", "チェリー", 
+          "トマト", "スイカ", "すいか", "西瓜", "ラズベリー", "ザクロ", "ざくろ", "アセロラ",
+          "Apple", "Strawberry", "Cherry", "Tomato", "Watermelon", "Raspberry", "Pomegranate", "Acerola"
+        ]
+      },
+      {
+        id: 3,
+        text: "「118種の元素記号に使われているアルファベット頻出トップ9」といえば？ Name one of the top 9 most frequent letters used in element symbols!",
+        answers: [
+          "R", "r", "A", "a", "C", "c", "S", "s", "N", "n", "B", "b", "E", "e", "M", "m", "T", "t"
+        ]
+      },
+      {
+        id: 4,
+        text: "「太陽系の惑星」といえば？ Name a planet in our Solar System!",
+        answers: [
+          "水星", "金星", "地球", "火星", "木星", "土星", "天王星", "海王星",
+          "Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"
+        ]
+      },
+      {
+        id: 5,
+        text: "「理農館5階に存在する部屋の番号」といえば？ Name a room number located on the 5th floor of Rinokan!",
+        answers: [
+          "SA501", "SA502", "SA515", "SA516", "SA518", "SA519", "SA521", 
+          "SA522-1", "SA522-2", "SA522_1", "SA522_2", "SA5221", "SA5222",
+          "SA526", "SA528", "SA529", "SA531", "SA533", "SA538",
+          "sa501", "sa502", "sa515", "sa516", "sa518", "sa519", "sa521", 
+          "sa522-1", "sa522-2", "sa522_1", "sa522_2", "sa5221", "sa5222",
+          "sa526", "sa528", "sa529", "sa531", "sa533", "sa538"
+        ]
+      },
+      {
+        id: 6,
+        text: "「八木研のLab Motto」に含まれる英単語といえば？ Name an English word included in the Yagi Lab Motto!",
+        answers: [
+          "Be", "be", "BE", 
+          "Unique", "unique", "UNIQUE", 
+          "Go", "go", "GO", 
+          "Hungry", "hungry", "HUNGRY", 
+          "Interact", "interact", "INTERACT", 
+          "with", "With", "WITH", 
+          "the", "The", "THE", 
+          "World", "world", "WORLD"
+        ]
+      }
+    ];
+
+    const TEAMS = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"];
+    let currentRole = "";
+    let myTeam = "";
+
+    function toggleTeamSelect() {
+      const role = document.getElementById("role-select").value;
+      document.getElementById("team-select-container").classList.toggle("hidden", role !== "player");
+    }
+
+    async function startApp() {
+      currentRole = document.getElementById("role-select").value;
+      myTeam = document.getElementById("team-select").value;
+      document.getElementById("setup-screen").classList.add("hidden");
+
+      if (currentRole === "mc") {
+        document.getElementById("mc-screen").classList.remove("hidden");
+        initMC();
+      } else {
+        document.getElementById("player-screen").classList.remove("hidden");
+        document.getElementById("player-team-badge").textContent = `${myTeam} 班`;
+        initPlayer();
+      }
+    }
+
+    // --- 3. MC ロジック ---
+    function initMC() {
+      db.collection("game").doc("state").onSnapshot(doc => {
+        if (!doc.exists) return;
+        const state = doc.data();
+        const qIndex = state.currentQIndex || 0;
+        const q = quizQuestions[qIndex];
+
+        document.getElementById("mc-q-num").textContent = `第 ${qIndex + 1} 問 / 全 ${quizQuestions.length} 問`;
+        document.getElementById("mc-q-text").textContent = q.text;
+        document.getElementById("mc-q-answers").textContent = `想定解: ${q.answers.join(", ")}`;
+        document.getElementById("mc-status-badge").textContent = 
+          state.status === "open" ? "回答受付中" : state.status === "closed" ? "締切" : "待機中";
+      });
+
+      db.collection("answers").onSnapshot(snapshot => {
+        const answers = {};
+        snapshot.forEach(doc => { answers[doc.id] = doc.data(); });
+        renderMCTable(answers);
+      });
+
+      db.collection("scores").onSnapshot(snapshot => {
+        const scores = {};
+        snapshot.forEach(doc => { scores[doc.id] = doc.data().score || 0; });
+        renderMCLeaderboard(scores);
+      });
+    }
+
+    function renderMCTable(answers) {
+      const tbody = document.getElementById("mc-answers-table");
+      tbody.innerHTML = "";
+
+      TEAMS.forEach(team => {
+        const data = answers[team] || { text: "", isPublic: false, isDuplicate: false, isCorrect: false };
+        const tr = document.createElement("tr");
+        tr.className = "border-b text-sm";
+        tr.innerHTML = `
+          <td class="p-2 font-bold">${team}班</td>
+          <td class="p-2">${data.text || '<span class="text-gray-400">未送信</span>'}</td>
+          <td class="p-2 text-center">
+            <input type="checkbox" ${data.isPublic ? 'checked' : ''} onchange="updateAnswerFlag('${team}', 'isPublic', this.checked)">
+          </td>
+          <td class="p-2 text-center">
+            <input type="checkbox" ${data.isDuplicate ? 'checked' : ''} onchange="updateAnswerFlag('${team}', 'isDuplicate', this.checked)">
+          </td>
+          <td class="p-2 text-center">
+            <input type="checkbox" ${data.isCorrect ? 'checked' : ''} onchange="updateAnswerFlag('${team}', 'isCorrect', this.checked)">
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderMCLeaderboard(scores) {
+      const container = document.getElementById("mc-leaderboard");
+      container.innerHTML = "";
+      
+      const sorted = TEAMS.map(t => ({ team: t, score: scores[t] || 0 }))
+                          .sort((a, b) => b.score - a.score);
+
+      sorted.forEach((item, index) => {
+        const div = document.createElement("div");
+        div.className = "p-2 bg-slate-50 rounded border text-center";
+        div.innerHTML = `<span class="text-xs text-gray-500">${index + 1}位</span> <strong class="block">${item.team}班: ${item.score}pt</strong>`;
+        container.appendChild(div);
+      });
+    }
+
+    async function setStatus(status) {
+      await db.collection("game").doc("state").set({ status }, { merge: true });
+    }
+
+    async function updateAnswerFlag(team, field, value) {
+      await db.collection("answers").doc(team).set({ [field]: value }, { merge: true });
+    }
+
+    async function checkDuplicates() {
+      const stateDoc = await db.collection("game").doc("state").get();
+      const qIndex = stateDoc.data().currentQIndex || 0;
+      const validAnswers = quizQuestions[qIndex].answers.map(a => a.trim().toLowerCase());
+
+      const snapshot = await db.collection("answers").get();
+      const countMap = {};
+      const teamAnswers = {};
+
+      snapshot.forEach(doc => {
+        const text = (doc.data().text || "").trim().toLowerCase();
+        teamAnswers[doc.id] = text;
+        if (text) countMap[text] = (countMap[text] || 0) + 1;
+      });
+
+      TEAMS.forEach(async team => {
+        const ans = teamAnswers[team];
+        const isDuplicate = ans ? countMap[ans] > 1 : false;
+        const isCorrect = ans ? validAnswers.includes(ans) : false;
+
+        await db.collection("answers").doc(team).set({
+          isDuplicate: isDuplicate,
+          isCorrect: isCorrect && !isDuplicate
+        }, { merge: true });
+      });
+    }
+
+    async function finalizeScore() {
+      const snapshot = await db.collection("answers").get();
+      snapshot.forEach(async doc => {
+        const data = doc.data();
+        if (data.isCorrect && !data.isDuplicate) {
+          const scoreDoc = await db.collection("scores").doc(doc.id).get();
+          const currentScore = (scoreDoc.exists ? scoreDoc.data().score : 0) || 0;
+          await db.collection("scores").doc(doc.id).set({ score: currentScore + 1 });
+        }
+      });
+      alert("ポイントの加算が完了しました。");
+    }
+
+    async function nextQuestion() {
+      const stateDoc = await db.collection("game").doc("state").get();
+      const nextIndex = (stateDoc.data().currentQIndex || 0) + 1;
+      
+      if (nextIndex >= quizQuestions.length) {
+        alert("全問題が終了しました。");
+        return;
+      }
+
+      await db.collection("game").doc("state").set({ currentQIndex: nextIndex, status: "waiting" });
+      TEAMS.forEach(async team => {
+        await db.collection("answers").doc(team).set({ text: "", isPublic: false, isDuplicate: false, isCorrect: false });
+      });
+    }
+
+    // --- 4. 回答者 ロジック ---
+    function initPlayer() {
+      db.collection("game").doc("state").onSnapshot(doc => {
+        if (!doc.exists) return;
+        const state = doc.data();
+        const qIndex = state.currentQIndex || 0;
+        const q = quizQuestions[qIndex];
+
+        document.getElementById("player-q-num").textContent = `第 ${qIndex + 1} 問`;
+        document.getElementById("player-q-text").textContent = q.text;
+
+        const isClosed = state.status !== "open";
+        document.getElementById("player-input").disabled = isClosed;
+        document.getElementById("player-submit-btn").disabled = isClosed;
+        document.getElementById("player-status-badge").textContent = 
+          state.status === "open" ? "受付中" : "受付停止中";
+      });
+
+      db.collection("answers").onSnapshot(snapshot => {
+        const answers = {};
+        snapshot.forEach(doc => { answers[doc.id] = doc.data(); });
+
+        if (answers[myTeam] && answers[myTeam].text) {
+          document.getElementById("player-input").value = answers[myTeam].text;
+          document.getElementById("player-input").disabled = true;
+          document.getElementById("player-submit-btn").disabled = true;
+          document.getElementById("player-submitted-msg").classList.remove("hidden");
+        } else {
+          document.getElementById("player-submitted-msg").classList.add("hidden");
+        }
+
+        renderPlayerPublicAnswers(answers);
+      });
+    }
+
+    function renderPlayerPublicAnswers(answers) {
+      const container = document.getElementById("player-public-answers");
+      container.innerHTML = "";
+
+      TEAMS.forEach(team => {
+        const data = answers[team];
+        if (data && data.isPublic) {
+          const div = document.createElement("div");
+          const isDup = data.isDuplicate;
+          div.className = `p-2 rounded border font-bold text-center ${isDup ? 'bg-rose-100 text-rose-800 border-rose-300' : 'bg-slate-50 border-slate-200'}`;
+          div.textContent = `${team}班: ${data.text} ${isDup ? '(カブり!)' : ''}`;
+          container.appendChild(div);
+        }
+      });
+    }
+
+    async function submitAnswer() {
+      const text = document.getElementById("player-input").value.trim();
+      if (!text) return;
+
+      await db.collection("answers").doc(myTeam).set({
+        text: text,
+        isPublic: false,
+        isDuplicate: false,
+        isCorrect: false
+      }, { merge: true });
+    }
+  </script>
 </body>
 </html>
