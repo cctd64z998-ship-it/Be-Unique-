@@ -179,4 +179,286 @@
       },
       {
         id: 5,
-        text: "「理農館5階に存在する部屋の番号」といえば？ Name a room number
+        text: "「理農館5階に存在する部屋の番号」といえば？ Name a room number located on the 5th floor of Rinokan!",
+        answers: [
+          "SA501", "SA502", "SA515", "SA516", "SA518", "SA519", "SA521", 
+          "SA522-1", "SA522-2", "SA522_1", "SA522_2", "SA5221", "SA5222",
+          "SA526", "SA528", "SA529", "SA531", "SA533", "SA538",
+          "sa501", "sa502", "sa515", "sa516", "sa518", "sa519", "sa521", 
+          "sa522-1", "sa522-2", "sa522_1", "sa522_2", "sa5221", "sa5222",
+          "sa526", "sa528", "sa529", "sa531", "sa533", "sa538"
+        ]
+      },
+      {
+        id: 6,
+        text: "「八木研のLab Motto」に含まれる英単語といえば？ Name an English word included in the Yagi Lab Motto!",
+        answers: [
+          "Be", "be", "BE", 
+          "Unique", "unique", "UNIQUE", 
+          "Go", "go", "GO", 
+          "Hungry", "hungry", "HUNGRY", 
+          "Interact", "interact", "INTERACT", 
+          "with", "With", "WITH", 
+          "the", "The", "THE", 
+          "World", "world", "WORLD"
+        ]
+      }
+    ];
+
+    const TEAMS = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"];
+    let currentRole = "";
+    let myTeam = "";
+
+    function toggleTeamSelect() {
+      const role = document.getElementById("role-select").value;
+      const teamContainer = document.getElementById("team-select-container");
+      if (role === "player") {
+        teamContainer.classList.remove("hidden");
+      } else {
+        teamContainer.classList.add("hidden");
+      }
+    }
+
+    function startApp() {
+      currentRole = document.getElementById("role-select").value;
+      const teamSelect = document.getElementById("team-select");
+      myTeam = teamSelect ? teamSelect.value : "A";
+
+      document.getElementById("setup-screen").classList.add("hidden");
+
+      if (currentRole === "mc") {
+        document.getElementById("mc-screen").classList.remove("hidden");
+        initMC();
+      } else {
+        document.getElementById("player-screen").classList.remove("hidden");
+        document.getElementById("player-team-badge").textContent = `${myTeam} 班`;
+        initPlayer();
+      }
+    }
+
+    function initMC() {
+      // 初期状態が存在しない場合は作成する
+      db.collection("game").doc("state").get().then(doc => {
+        if (!doc.exists) {
+          db.collection("game").doc("state").set({ currentQIndex: 0, status: "waiting" });
+        }
+      });
+
+      db.collection("game").doc("state").onSnapshot(doc => {
+        const state = doc.exists ? doc.data() : { currentQIndex: 0, status: "waiting" };
+        const qIndex = state.currentQIndex || 0;
+        const q = quizQuestions[qIndex] || quizQuestions[0];
+
+        document.getElementById("mc-q-num").textContent = `第 ${qIndex + 1} 問 / 全 ${quizQuestions.length} 問`;
+        document.getElementById("mc-q-text").textContent = q ? q.text : "";
+        document.getElementById("mc-q-answers").textContent = `想定解: ${q ? q.answers.join(", ") : "-"}`;
+        document.getElementById("mc-status-badge").textContent = 
+          state.status === "open" ? "回答受付中" : state.status === "closed" ? "締切" : "待機中";
+      });
+
+      db.collection("answers").onSnapshot(snapshot => {
+        const answers = {};
+        snapshot.forEach(doc => { answers[doc.id] = doc.data(); });
+        renderMCTable(answers);
+      });
+
+      db.collection("scores").onSnapshot(snapshot => {
+        const scores = {};
+        snapshot.forEach(doc => { scores[doc.id] = doc.data().score || 0; });
+        renderMCLeaderboard(scores);
+      });
+    }
+
+    function renderMCTable(answers) {
+      const tbody = document.getElementById("mc-answers-table");
+      tbody.innerHTML = "";
+
+      TEAMS.forEach(team => {
+        const data = answers[team] || { text: "", isPublic: false, isDuplicate: false, isCorrect: false };
+        const tr = document.createElement("tr");
+        tr.className = "border-b text-sm";
+        tr.innerHTML = `
+          <td class="p-2 font-bold">${team}班</td>
+          <td class="p-2">${data.text || '<span class="text-gray-400">未送信</span>'}</td>
+          <td class="p-2 text-center">
+            <input type="checkbox" ${data.isPublic ? 'checked' : ''} onchange="updateAnswerFlag('${team}', 'isPublic', this.checked)">
+          </td>
+          <td class="p-2 text-center">
+            <input type="checkbox" ${data.isDuplicate ? 'checked' : ''} onchange="updateAnswerFlag('${team}', 'isDuplicate', this.checked)">
+          </td>
+          <td class="p-2 text-center">
+            <input type="checkbox" ${data.isCorrect ? 'checked' : ''} onchange="updateAnswerFlag('${team}', 'isCorrect', this.checked)">
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderMCLeaderboard(scores) {
+      const container = document.getElementById("mc-leaderboard");
+      container.innerHTML = "";
+      
+      const sorted = TEAMS.map(t => ({ team: t, score: scores[t] || 0 }))
+                          .sort((a, b) => b.score - a.score);
+
+      sorted.forEach((item, index) => {
+        const div = document.createElement("div");
+        div.className = "p-2 bg-slate-50 rounded border text-center";
+        div.innerHTML = `<span class="text-xs text-gray-500">${index + 1}位</span> <strong class="block">${item.team}班: ${item.score}pt</strong>`;
+        container.appendChild(div);
+      });
+    }
+
+    async function setStatus(status) {
+      await db.collection("game").doc("state").set({ status }, { merge: true });
+    }
+
+    async function updateAnswerFlag(team, field, value) {
+      await db.collection("answers").doc(team).set({ [field]: value }, { merge: true });
+    }
+
+    async function checkDuplicates() {
+      const stateDoc = await db.collection("game").doc("state").get();
+      const qIndex = (stateDoc.exists && stateDoc.data().currentQIndex) || 0;
+      const validAnswers = quizQuestions[qIndex].answers.map(a => a.trim().toLowerCase());
+
+      const snapshot = await db.collection("answers").get();
+      const countMap = {};
+      const teamAnswers = {};
+
+      snapshot.forEach(doc => {
+        const text = (doc.data().text || "").trim().toLowerCase();
+        teamAnswers[doc.id] = text;
+        if (text) countMap[text] = (countMap[text] || 0) + 1;
+      });
+
+      TEAMS.forEach(async team => {
+        const ans = teamAnswers[team];
+        const isDuplicate = ans ? countMap[ans] > 1 : false;
+        const isCorrect = ans ? validAnswers.includes(ans) : false;
+
+        await db.collection("answers").doc(team).set({
+          isDuplicate: isDuplicate,
+          isCorrect: isCorrect && !isDuplicate
+        }, { merge: true });
+      });
+    }
+
+    async function finalizeScore() {
+      const snapshot = await db.collection("answers").get();
+      snapshot.forEach(async doc => {
+        const data = doc.data();
+        if (data.isCorrect && !data.isDuplicate) {
+          const scoreDoc = await db.collection("scores").doc(doc.id).get();
+          const currentScore = (scoreDoc.exists ? scoreDoc.data().score : 0) || 0;
+          await db.collection("scores").doc(doc.id).set({ score: currentScore + 1 });
+        }
+      });
+      alert("ポイントの加算が完了しました。");
+    }
+
+    async function nextQuestion() {
+      const stateDoc = await db.collection("game").doc("state").get();
+      const nextIndex = ((stateDoc.exists && stateDoc.data().currentQIndex) || 0) + 1;
+      
+      if (nextIndex >= quizQuestions.length) {
+        alert("全問題が終了しました。");
+        return;
+      }
+
+      await db.collection("game").doc("state").set({ currentQIndex: nextIndex, status: "waiting" });
+      TEAMS.forEach(async team => {
+        await db.collection("answers").doc(team).set({ text: "", isPublic: false, isDuplicate: false, isCorrect: false });
+      });
+    }
+
+    async function resetAllGameData() {
+      if (!confirm("テストデータや得点を全て消去して第1問に戻しますか？")) return;
+
+      await db.collection("game").doc("state").set({ currentQIndex: 0, status: "waiting" });
+
+      const answersSnap = await db.collection("answers").get();
+      answersSnap.forEach(async doc => {
+        await db.collection("answers").doc(doc.id).set({ text: "", isPublic: false, isDuplicate: false, isCorrect: false });
+      });
+
+      TEAMS.forEach(async team => {
+        await db.collection("scores").doc(team).set({ score: 0 });
+      });
+
+      alert("全データをリセットしました！第1問からスタートできます。");
+    }
+
+    function initPlayer() {
+      db.collection("game").doc("state").onSnapshot(doc => {
+        const state = doc.exists ? doc.data() : { currentQIndex: 0, status: "waiting" };
+        const qIndex = state.currentQIndex || 0;
+        const q = quizQuestions[qIndex] || quizQuestions[0];
+
+        document.getElementById("player-q-num").textContent = `第 ${qIndex + 1} 問`;
+        document.getElementById("player-q-text").textContent = q ? q.text : "";
+
+        const isClosed = state.status !== "open";
+        document.getElementById("player-status-badge").textContent = 
+          state.status === "open" ? "受付中" : "受付停止中";
+
+        if (window.lastQIndex !== undefined && window.lastQIndex !== qIndex) {
+          document.getElementById("player-input").value = "";
+          document.getElementById("player-input").disabled = isClosed;
+          document.getElementById("player-submit-btn").disabled = isClosed;
+          document.getElementById("player-submitted-msg").classList.add("hidden");
+        }
+        window.lastQIndex = qIndex;
+      });
+
+      db.collection("answers").onSnapshot(snapshot => {
+        const answers = {};
+        snapshot.forEach(doc => { answers[doc.id] = doc.data(); });
+
+        if (answers[myTeam] && answers[myTeam].text) {
+          document.getElementById("player-input").value = answers[myTeam].text;
+          document.getElementById("player-input").disabled = true;
+          document.getElementById("player-submit-btn").disabled = true;
+          document.getElementById("player-submitted-msg").classList.remove("hidden");
+        } else {
+          const stateDocStatus = document.getElementById("player-status-badge").textContent;
+          const isClosed = stateDocStatus !== "受付中";
+          document.getElementById("player-input").disabled = isClosed;
+          document.getElementById("player-submit-btn").disabled = isClosed;
+          document.getElementById("player-submitted-msg").classList.add("hidden");
+        }
+
+        renderPlayerPublicAnswers(answers);
+      });
+    }
+
+    function renderPlayerPublicAnswers(answers) {
+      const container = document.getElementById("player-public-answers");
+      container.innerHTML = "";
+
+      TEAMS.forEach(team => {
+        const data = answers[team];
+        if (data && data.isPublic) {
+          const div = document.createElement("div");
+          const isDup = data.isDuplicate;
+          div.className = `p-2 rounded border font-bold text-center ${isDup ? 'bg-rose-100 text-rose-800 border-rose-300' : 'bg-slate-50 border-slate-200'}`;
+          div.textContent = `${team}班: ${data.text} ${isDup ? '(カブり!)' : ''}`;
+          container.appendChild(div);
+        }
+      });
+    }
+
+    async function submitAnswer() {
+      const text = document.getElementById("player-input").value.trim();
+      if (!text) return;
+
+      await db.collection("answers").doc(myTeam).set({
+        text: text,
+        isPublic: false,
+        isDuplicate: false,
+        isCorrect: false
+      }, { merge: true });
+    }
+  </script>
+</body>
+</html>
