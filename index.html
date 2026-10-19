@@ -49,7 +49,7 @@
       </div>
       <div class="flex items-center gap-3">
         <button onclick="resetAllGameData()" class="bg-rose-100 text-rose-700 border border-rose-300 px-3 py-1 rounded-lg text-xs font-bold hover:bg-rose-200">
-          全データリセット（本番開始用）
+          全データリセット
         </button>
         <div id="mc-status-badge" class="px-3 py-1 bg-gray-200 text-gray-700 rounded-full text-sm font-bold">
           待機中
@@ -224,28 +224,22 @@
       const teamSelect = document.getElementById("team-select");
       myTeam = teamSelect ? teamSelect.value : "A";
 
+      // エラーが起きても確実に画面を切り替える
       document.getElementById("setup-screen").classList.add("hidden");
 
       if (currentRole === "mc") {
         document.getElementById("mc-screen").classList.remove("hidden");
-        initMC();
+        try { initMC(); } catch(e) { console.error(e); }
       } else {
         document.getElementById("player-screen").classList.remove("hidden");
         document.getElementById("player-team-badge").textContent = `${myTeam} 班`;
-        initPlayer();
+        try { initPlayer(); } catch(e) { console.error(e); }
       }
     }
 
     function initMC() {
-      // 初期状態が存在しない場合は作成する
-      db.collection("game").doc("state").get().then(doc => {
-        if (!doc.exists) {
-          db.collection("game").doc("state").set({ currentQIndex: 0, status: "waiting" });
-        }
-      });
-
       db.collection("game").doc("state").onSnapshot(doc => {
-        const state = doc.exists ? doc.data() : { currentQIndex: 0, status: "waiting" };
+        const state = (doc && doc.exists) ? doc.data() : { currentQIndex: 0, status: "waiting" };
         const qIndex = state.currentQIndex || 0;
         const q = quizQuestions[qIndex] || quizQuestions[0];
 
@@ -258,13 +252,17 @@
 
       db.collection("answers").onSnapshot(snapshot => {
         const answers = {};
-        snapshot.forEach(doc => { answers[doc.id] = doc.data(); });
+        if (snapshot) {
+          snapshot.forEach(doc => { answers[doc.id] = doc.data(); });
+        }
         renderMCTable(answers);
       });
 
       db.collection("scores").onSnapshot(snapshot => {
         const scores = {};
-        snapshot.forEach(doc => { scores[doc.id] = doc.data().score || 0; });
+        if (snapshot) {
+          snapshot.forEach(doc => { scores[doc.id] = doc.data().score || 0; });
+        }
         renderMCLeaderboard(scores);
       });
     }
@@ -309,89 +307,95 @@
       });
     }
 
-    async function setStatus(status) {
-      await db.collection("game").doc("state").set({ status }, { merge: true });
+    function setStatus(status) {
+      db.collection("game").doc("state").set({ status }, { merge: true });
     }
 
-    async function updateAnswerFlag(team, field, value) {
-      await db.collection("answers").doc(team).set({ [field]: value }, { merge: true });
+    function updateAnswerFlag(team, field, value) {
+      db.collection("answers").doc(team).set({ [field]: value }, { merge: true });
     }
 
-    async function checkDuplicates() {
-      const stateDoc = await db.collection("game").doc("state").get();
-      const qIndex = (stateDoc.exists && stateDoc.data().currentQIndex) || 0;
-      const validAnswers = quizQuestions[qIndex].answers.map(a => a.trim().toLowerCase());
+    function checkDuplicates() {
+      db.collection("game").doc("state").get().then(stateDoc => {
+        const qIndex = (stateDoc.exists && stateDoc.data().currentQIndex) || 0;
+        const validAnswers = quizQuestions[qIndex].answers.map(a => a.trim().toLowerCase());
 
-      const snapshot = await db.collection("answers").get();
-      const countMap = {};
-      const teamAnswers = {};
+        db.collection("answers").get().then(snapshot => {
+          const countMap = {};
+          const teamAnswers = {};
 
-      snapshot.forEach(doc => {
-        const text = (doc.data().text || "").trim().toLowerCase();
-        teamAnswers[doc.id] = text;
-        if (text) countMap[text] = (countMap[text] || 0) + 1;
+          snapshot.forEach(doc => {
+            const text = (doc.data().text || "").trim().toLowerCase();
+            teamAnswers[doc.id] = text;
+            if (text) countMap[text] = (countMap[text] || 0) + 1;
+          });
+
+          TEAMS.forEach(team => {
+            const ans = teamAnswers[team];
+            const isDuplicate = ans ? countMap[ans] > 1 : false;
+            const isCorrect = ans ? validAnswers.includes(ans) : false;
+
+            db.collection("answers").doc(team).set({
+              isDuplicate: isDuplicate,
+              isCorrect: isCorrect && !isDuplicate
+            }, { merge: true });
+          });
+        });
       });
+    }
 
-      TEAMS.forEach(async team => {
-        const ans = teamAnswers[team];
-        const isDuplicate = ans ? countMap[ans] > 1 : false;
-        const isCorrect = ans ? validAnswers.includes(ans) : false;
-
-        await db.collection("answers").doc(team).set({
-          isDuplicate: isDuplicate,
-          isCorrect: isCorrect && !isDuplicate
-        }, { merge: true });
+    function finalizeScore() {
+      db.collection("answers").get().then(snapshot => {
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          if (data.isCorrect && !data.isDuplicate) {
+            db.collection("scores").doc(doc.id).get().then(scoreDoc => {
+              const currentScore = (scoreDoc.exists ? scoreDoc.data().score : 0) || 0;
+              db.collection("scores").doc(doc.id).set({ score: currentScore + 1 });
+            });
+          }
+        });
+        alert("ポイントの加算が完了しました。");
       });
     }
 
-    async function finalizeScore() {
-      const snapshot = await db.collection("answers").get();
-      snapshot.forEach(async doc => {
-        const data = doc.data();
-        if (data.isCorrect && !data.isDuplicate) {
-          const scoreDoc = await db.collection("scores").doc(doc.id).get();
-          const currentScore = (scoreDoc.exists ? scoreDoc.data().score : 0) || 0;
-          await db.collection("scores").doc(doc.id).set({ score: currentScore + 1 });
+    function nextQuestion() {
+      db.collection("game").doc("state").get().then(stateDoc => {
+        const nextIndex = ((stateDoc.exists && stateDoc.data().currentQIndex) || 0) + 1;
+        
+        if (nextIndex >= quizQuestions.length) {
+          alert("全問題が終了しました。");
+          return;
         }
-      });
-      alert("ポイントの加算が完了しました。");
-    }
 
-    async function nextQuestion() {
-      const stateDoc = await db.collection("game").doc("state").get();
-      const nextIndex = ((stateDoc.exists && stateDoc.data().currentQIndex) || 0) + 1;
-      
-      if (nextIndex >= quizQuestions.length) {
-        alert("全問題が終了しました。");
-        return;
-      }
-
-      await db.collection("game").doc("state").set({ currentQIndex: nextIndex, status: "waiting" });
-      TEAMS.forEach(async team => {
-        await db.collection("answers").doc(team).set({ text: "", isPublic: false, isDuplicate: false, isCorrect: false });
+        db.collection("game").doc("state").set({ currentQIndex: nextIndex, status: "waiting" });
+        TEAMS.forEach(team => {
+          db.collection("answers").doc(team).set({ text: "", isPublic: false, isDuplicate: false, isCorrect: false });
+        });
       });
     }
 
-    async function resetAllGameData() {
-      if (!confirm("テストデータや得点を全て消去して第1問に戻しますか？")) return;
+    function resetAllGameData() {
+      if (!confirm("データを初期化して第1問に戻しますか？")) return;
 
-      await db.collection("game").doc("state").set({ currentQIndex: 0, status: "waiting" });
+      db.collection("game").doc("state").set({ currentQIndex: 0, status: "waiting" });
 
-      const answersSnap = await db.collection("answers").get();
-      answersSnap.forEach(async doc => {
-        await db.collection("answers").doc(doc.id).set({ text: "", isPublic: false, isDuplicate: false, isCorrect: false });
+      db.collection("answers").get().then(answersSnap => {
+        answersSnap.forEach(doc => {
+          db.collection("answers").doc(doc.id).set({ text: "", isPublic: false, isDuplicate: false, isCorrect: false });
+        });
       });
 
-      TEAMS.forEach(async team => {
-        await db.collection("scores").doc(team).set({ score: 0 });
+      TEAMS.forEach(team => {
+        db.collection("scores").doc(team).set({ score: 0 });
       });
 
-      alert("全データをリセットしました！第1問からスタートできます。");
+      alert("リセットが完了しました。");
     }
 
     function initPlayer() {
       db.collection("game").doc("state").onSnapshot(doc => {
-        const state = doc.exists ? doc.data() : { currentQIndex: 0, status: "waiting" };
+        const state = (doc && doc.exists) ? doc.data() : { currentQIndex: 0, status: "waiting" };
         const qIndex = state.currentQIndex || 0;
         const q = quizQuestions[qIndex] || quizQuestions[0];
 
@@ -413,7 +417,9 @@
 
       db.collection("answers").onSnapshot(snapshot => {
         const answers = {};
-        snapshot.forEach(doc => { answers[doc.id] = doc.data(); });
+        if (snapshot) {
+          snapshot.forEach(doc => { answers[doc.id] = doc.data(); });
+        }
 
         if (answers[myTeam] && answers[myTeam].text) {
           document.getElementById("player-input").value = answers[myTeam].text;
@@ -448,11 +454,11 @@
       });
     }
 
-    async function submitAnswer() {
+    function submitAnswer() {
       const text = document.getElementById("player-input").value.trim();
       if (!text) return;
 
-      await db.collection("answers").doc(myTeam).set({
+      db.collection("answers").doc(myTeam).set({
         text: text,
         isPublic: false,
         isDuplicate: false,
